@@ -28,6 +28,7 @@
     "@pinia/nuxt": "^0.5.4",
     "@vueuse/core": "^11.0.3",
     "@vueuse/nuxt": "^11.0.3",
+    "es-toolkit": "^1.17.0",
     "pinia": "^2.2.2"
   }
 }

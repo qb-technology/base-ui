@@ -8,6 +8,7 @@
 - @pinia-plugin-persistedstate/nuxt
 - device
 - @nuxt/fonts
+- es-toolkit
 
 
 
