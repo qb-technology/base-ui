@@ -1,6 +1,21 @@
 <script setup lang="ts">
 import * as z from 'zod'
-import type { FormSubmitEvent } from '#ui/types'
+import type { ButtonProps, FormSubmitEvent } from '#ui/types'
+
+defineProps({
+  nameContainerClass: {
+    type: String,
+    default: 'md:grid-cols-2'
+  },
+  button: {
+    type: Object as PropType<ButtonProps>,
+    default: () => ({
+      label: 'Login',
+      block: true,
+      size: 'xl'
+    })
+  },
+})
 
 const emits = defineEmits(['submit'])
 
@@ -29,24 +44,47 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-    <UFormField label="Email" name="email">
+  <UForm
+    :schema="schema"
+    :state="state"
+    class="space-y-4"
+    @submit="onSubmit"
+  >
+    <UFormField
+      label="Email"
+      name="email"
+    >
       <UInput v-model="state.email" />
     </UFormField>
 
-    <UFormField label="Password" name="password">
-      <UInput v-model="state.password" placeholder="Password" :type="show ? 'text' : 'password'"
-        :ui="{ trailing: 'pe-1' }">
+    <UFormField
+      label="Password"
+      name="password"
+    >
+      <UInput
+        v-model="state.password"
+        placeholder="Password"
+        :type="show ? 'text' : 'password'"
+        :ui="{ trailing: 'pe-1' }"
+      >
         <template #trailing>
-          <UButton color="neutral" variant="link" size="sm" :icon="show ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-            aria-label="show ? 'Hide password' : 'Show password'" :aria-pressed="show" aria-controls="password"
-            @click="show = !show" />
+          <UButton
+            color="neutral"
+            variant="link"
+            size="sm"
+            :icon="show ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+            aria-label="show ? 'Hide password' : 'Show password'"
+            :aria-pressed="show"
+            aria-controls="password"
+            @click="show = !show"
+          />
         </template>
       </UInput>
     </UFormField>
 
-    <UButton type="submit">
-      Submit
-    </UButton>
+    <UButton
+      v-bind="button"
+      type="submit"
+    />
   </UForm>
 </template>

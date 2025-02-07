@@ -8,5 +8,7 @@ export default withNuxt(
   '@typescript-eslint/no-unused-vars': 'off',
   '@stylistic/comma-dangle': 'off',
   '@typescript-eslint/no-explicit-any': 'off',
-  'vue/html-self-closing': 'off'
+  'vue/html-self-closing': 'off',
+  '@stylistic/quotes': 'off',
+  'nuxt/nuxt-config-keys-order': 'off'
 })

@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import * as z from 'zod'
-import type { FormSubmitEvent } from '#ui/types'
+import type { PropType } from 'vue';
+import type { FormSubmitEvent, ButtonProps } from '#ui/types'
 
 defineProps({
   nameContainerClass: {
     type: String,
-    default: 'md:grid-cols-2 '
-  }
+    default: 'md:grid-cols-2'
+  },
+  button: {
+    type: Object as PropType<ButtonProps>,
+    default: () => ({
+      label: 'Sign Up',
+      block: true,
+      size: 'xl'
+    })
+  },
 })
 
 const emits = defineEmits(['submit'])
@@ -69,8 +78,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     <FormInputPassword v-model="state.password" />
 
-    <UButton type="submit">
-      Sign Up
-    </UButton>
+    <UButton
+      v-bind="button"
+      type="submit"
+    />
   </UForm>
 </template>
