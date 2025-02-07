@@ -13,25 +13,17 @@
   },
   "devDependencies": {
     "@iconify-json/fluent": "^1.2.1",
-    "@nuxt/eslint": "latest",
-    "@nuxt/fonts": "^0.7.2",
-    "@nuxt/image": "^1.8.0",
-    "@nuxt/scripts": "^0.8.5",
-    "@nuxt/ui": "^2.18.4",
-    "@nuxtjs/device": "^3.2.2",
-    "@pinia-plugin-persistedstate/nuxt": "^1.2.1",
-    "eslint": "^9.9.1",
+    "@iconify-json/heroicons": "^1.2.2",
+    "@nuxt/eslint": "1.0.0",
+    "@nuxt/ui": "^3.0.0-alpha.12",
+    "@vueuse/nuxt": "12.5.0",
+    "eslint": "^8.57.0 || ^9.0.0",
     "nuxt": "^3.13.0",
     "typescript": "^5.5.4",
     "vue": "latest"
   },
   "dependencies": {
-    "@pinia/nuxt": "^0.5.4",
-    "@vueuse/core": "^11.0.3",
-    "@vueuse/nuxt": "^11.0.3",
     "es-toolkit": "^1.17.0",
-    "pinia": "^2.2.2",
-    "tailwind-merge": "^2.5.2",
-    "zod": "^3.23.8"
+    "zod": "^3.24.1"
   }
 }

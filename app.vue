@@ -1,4 +1,5 @@
 <template>
-  <HelloWorld />
-  <BaseDarkMode />
+  <UApp>
+    <NuxtPage />
+  </UApp>
 </template>
