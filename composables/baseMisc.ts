@@ -15,6 +15,6 @@ export function useToastFailure(title = 'Oops!!', description = 'Something unexp
     description: description,
     icon: 'i-heroicons-exclamation-triangle-20-solid',
     duration: 3000,
-    color: 'warning'
+    color: 'error'
   })
 }

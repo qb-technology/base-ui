@@ -28,7 +28,8 @@ const schema = z.object({
     .regex(/([a-z])/, 'Must contain at least one lowercase character')
     .regex(/([A-Z])/, 'Must contain at least one uppercase character')
     .regex(/([!@#$%^&*])/, 'Must contain at least one symbol')
-    .min(8, 'Must be at least 8 characters')
+    .min(8, 'Must be at least 8 characters'),
+  tnc: z.boolean({ message: 'Required' })
 })
 
 type Schema = z.output<typeof schema>
@@ -38,6 +39,7 @@ const state = reactive<Partial<Schema>>({
   password: undefined,
   first_name: undefined,
   last_name: undefined,
+  tnc: undefined,
 })
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
@@ -77,6 +79,16 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     </UFormField>
 
     <FormInputPassword v-model="state.password" />
+
+    <UFormField name="tnc">
+      <UCheckbox v-model="state.tnc">
+        <template #label>
+          <span>I agree to the <ULink class="text-primary">Terms & Conditions</ULink>.</span>
+        </template>
+      </UCheckbox>
+    </UFormField>
+
+    <slot name="btnFormSubmit" />
 
     <UButton
       v-bind="button"

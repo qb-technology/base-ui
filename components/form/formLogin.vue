@@ -82,6 +82,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       </UInput>
     </UFormField>
 
+    <slot name="btnFormSubmit" />
+
     <UButton
       v-bind="button"
       type="submit"
