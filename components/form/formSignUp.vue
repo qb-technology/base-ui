@@ -2,6 +2,13 @@
 import * as z from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 
+defineProps({
+  nameContainerClass: {
+    type: String,
+    default: 'md:grid-cols-2 '
+  }
+})
+
 const emits = defineEmits(['submit'])
 
 const schema = z.object({
@@ -25,22 +32,38 @@ const state = reactive<Partial<Schema>>({
 })
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  console.log(event.data)
   emits('submit', event.data)
 }
 </script>
 
 <template>
-  <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-    <div class="grid md:grid-cols-2 gap-x-5 gap-y-4">
-      <UFormField label="First Name" name="first_name">
+  <UForm
+    :schema="schema"
+    :state="state"
+    class="space-y-4"
+    @submit="onSubmit"
+  >
+    <div
+      class="grid gap-x-5 gap-y-4"
+      :class="nameContainerClass"
+    >
+      <UFormField
+        label="First Name"
+        name="first_name"
+      >
         <UInput v-model="state.first_name" />
       </UFormField>
-      <UFormField label="Last Name" name="last_name">
+      <UFormField
+        label="Last Name"
+        name="last_name"
+      >
         <UInput v-model="state.last_name" />
       </UFormField>
     </div>
-    <UFormField label="Email" name="email">
+    <UFormField
+      label="Email"
+      name="email"
+    >
       <UInput v-model="state.email" />
     </UFormField>
 
