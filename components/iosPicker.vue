@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 // import type { EmblaCarouselVueType as EmblaCarouselType } from 'embla-carousel-vue';
-import type { EmblaCarouselType } from 'embla-carousel';
+import type { EmblaCarouselType, EmblaOptionsType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-vue'
 import { range } from 'es-toolkit';
 import type { PropType } from 'vue';
@@ -90,6 +90,10 @@ const props = defineProps({
     type: Number,
     default: 1
   },
+  startIndex: {
+    type: Number,
+    default: 0
+  },
   perspective: {
     type: String as PropType<'left' | 'right' | 'center'>,
     default: 'center',
@@ -104,36 +108,27 @@ const _modelValue = computed({
   get: () => props.modelValue
 })
 
-const options = computed(() => {
-  return {
-    loop: props.loop,
-    axis: 'y',
-    dragFree: true,
-    containScroll: false,
-    watchSlides: false
-  }
-})
+const options = {
+  loop: props.loop,
+  axis: 'y',
+  dragFree: true,
+  containScroll: false,
+  watchSlides: false,
+  startIndex: props.startIndex
+} as EmblaOptionsType
 
-const [emblaRef, emblaApi] = useEmblaCarousel(
-  {
-    loop: props.loop,
-    axis: 'y',
-    dragFree: true,
-    containScroll: false,
-    watchSlides: false,
-  }
-)
+const [emblaRef, emblaApi] = useEmblaCarousel({ ...options })
 
 const updateCurrentValue = (api: EmblaCarouselType) => {
   if (!api) return
-  _modelValue.value = api.selectedScrollSnap();
+  _modelValue.value = api.selectedScrollSnap() + 1;
 }
 
 const rootNodeRef = ref(null)
-const _slideCount = computed(() => slides.value.length)
 const totalRadius = computed(() => _slideCount.value * WHEEL_ITEM_RADIUS)
 const rotationOffset = computed(() => props.loop ? 0 : WHEEL_ITEM_RADIUS)
 const slides = computed(() => range(props.start, props.end, props.step))
+const _slideCount = computed(() => slides.value.length)
 
 const inactivateEmblaTransform = (api: EmblaCarouselType) => {
   if (!api) return
@@ -180,6 +175,10 @@ function initFunc() {
     inactivateEmblaTransform(api)
     rotateWheel(api)
   })
+  emblaApi.value.on('init', (api) => {
+    inactivateEmblaTransform(api)
+    rotateWheel(api)
+  })
   emblaApi.value.on('select', updateCurrentValue)
   // updateCurrentValue(emblaApi.value)
 }
@@ -187,15 +186,15 @@ function initFunc() {
 onMounted(() => {
   if (!emblaApi.value) return
   initFunc()
-  inactivateEmblaTransform(emblaApi.value)
-  rotateWheel(emblaApi.value)
 })
 
-watch(emblaApi, () => initFunc)
+watchArray([emblaApi, emblaRef, slides], () => {
+  initFunc()
+}, { deep: true })
 
-watch(emblaRef, () => {
-  // updateCurrentValue()
-})
+// watch(emblaRef, () => {
+//   // updateCurrentValue()
+// })
 
 defineExpose({
   emblaRef, emblaApi
@@ -204,22 +203,28 @@ defineExpose({
 
 <template>
   <div class="embla before:bg-linear-to-t before:from-[var(--ui-bg)]/65 before:to-[var(--ui-bg)] before:border-b-[0.5px] before:border-[var(--ui-border-muted)] after:border-t-[0.5px] after:border-[var(--ui-border-muted)] after:bg-linear-to-b after:from-[var(--ui-bg)]/65 after:to-[var(--ui-bg)]">
-    <div class="embla__ios-picker">
+    <div class="embla__ios-picker h-full min-w-[50%] flex items-center justify-center gap-3 relative">
       <div
         ref="rootNodeRef"
-        class="embla__ios-picker__scene"
+        class="embla__ios-picker__scene w-full h-full overflow-hidden flex items-center touch-pan-x"
       >
         <div
           ref="emblaRef"
           :class="[`embla__ios-picker__viewport embla__ios-picker__viewport--perspective-${perspective}`]"
         >
-          <div class="embla__ios-picker__container">
+          <div class="embla__ios-picker__container h-full w-full transform-3d will-change-transform">
             <div
               v-for="(_, index) of slides"
               :key="index"
-              class="embla__ios-picker__slide text-lg"
+              class="embla__ios-picker__slide text-lg w-fit"
             >
-              {{ _ }}
+              <slot
+                name="content"
+                :item="_"
+                :index="index"
+              >
+                {{ _ }}
+              </slot>
             </div>
           </div>
         </div>
@@ -270,6 +275,7 @@ defineExpose({
     rgba(var(--background-site-rgb-value), 1) 100%
   ); */
 }
+/*
 .embla__ios-picker {
   height: 100%;
   display: flex;
@@ -279,14 +285,14 @@ defineExpose({
   line-height: 1;
   font-size: 1.8rem;
 }
+
 .embla__ios-picker__scene {
-  min-width: 100%;
   height: 100%;
   overflow: hidden;
   display: flex;
   align-items: center;
   touch-action: pan-x;
-}
+}*/
 .embla__ios-picker__viewport {
   height: 32px;
   width: 100%;
@@ -311,12 +317,14 @@ defineExpose({
   perspective-origin: calc(50% - 0px) 50%;
   transform: translateX(0px);
 }
+/*
 .embla__ios-picker__container {
   height: 100%;
   width: 100%;
   transform-style: preserve-3d;
   will-change: transform;
 }
+*/
 .embla__ios-picker__slide {
   width: 100%;
   height: 100%;
@@ -329,8 +337,8 @@ defineExpose({
   opacity: 0;
 }
 .embla__ios-picker__label {
-  /* font-weight: 700; */
-  transform: translateX(-55px);
+  /* font-weight: 700;
+  transform: translateX(-55px);*/
   pointer-events: none;
 }
 </style>
