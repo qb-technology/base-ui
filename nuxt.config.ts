@@ -4,9 +4,7 @@ export default defineNuxtConfig({
   css: [
     './assets/css/main.css'
   ],
-  modules: [
-    "@nuxt/ui"
-  ],
+  modules: ["@nuxt/ui", "@vueuse/nuxt"],
   eslint: {
     config: {
       stylistic: {
