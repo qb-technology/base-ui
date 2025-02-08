@@ -2,6 +2,7 @@
 // import type { EmblaCarouselVueType as EmblaCarouselType } from 'embla-carousel-vue';
 import type { EmblaCarouselType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-vue'
+import { range } from 'es-toolkit';
 import type { PropType } from 'vue';
 
 const CIRCLE_DEGREES = 360
@@ -77,9 +78,17 @@ const props = defineProps({
     type: String,
     default: 'hours'
   },
-  slideCount: {
+  start: {
     type: Number,
-    default: 30
+    default: 0
+  },
+  end: {
+    type: Number,
+    default: 24
+  },
+  step: {
+    type: Number,
+    default: 1
   },
   perspective: {
     type: String as PropType<'left' | 'right' | 'center'>,
@@ -95,13 +104,23 @@ const _modelValue = computed({
   get: () => props.modelValue
 })
 
+const options = computed(() => {
+  return {
+    loop: props.loop,
+    axis: 'y',
+    dragFree: true,
+    containScroll: false,
+    watchSlides: false
+  }
+})
+
 const [emblaRef, emblaApi] = useEmblaCarousel(
   {
     loop: props.loop,
     axis: 'y',
     dragFree: true,
     containScroll: false,
-    watchSlides: false
+    watchSlides: false,
   }
 )
 
@@ -111,10 +130,10 @@ const updateCurrentValue = (api: EmblaCarouselType) => {
 }
 
 const rootNodeRef = ref(null)
-const totalRadius = computed(() => props.slideCount * WHEEL_ITEM_RADIUS)
+const _slideCount = computed(() => slides.value.length)
+const totalRadius = computed(() => _slideCount.value * WHEEL_ITEM_RADIUS)
 const rotationOffset = computed(() => props.loop ? 0 : WHEEL_ITEM_RADIUS)
-const slides = computed(() => Array.from(Array(props.slideCount).keys()))
-const _slideCount = computed(() => props.slideCount)
+const slides = computed(() => range(props.start, props.end, props.step))
 
 const inactivateEmblaTransform = (api: EmblaCarouselType) => {
   if (!api) return
@@ -129,11 +148,11 @@ const inactivateEmblaTransform = (api: EmblaCarouselType) => {
 
 function rotateWheel(api: EmblaCarouselType) {
   if (!api) return
-  const rotation = props.slideCount * WHEEL_ITEM_RADIUS - rotationOffset.value
+  const rotation = _slideCount.value * WHEEL_ITEM_RADIUS - rotationOffset.value
   const wheelRotation = rotation * api.scrollProgress()
   setContainerStyles(api, wheelRotation)
   api.slideNodes().forEach((_, index) => {
-    setSlideStyles(api, index, props.loop, props.slideCount, totalRadius.value)
+    setSlideStyles(api, index, props.loop, _slideCount.value, totalRadius.value)
   })
 }
 
@@ -200,7 +219,7 @@ defineExpose({
               :key="index"
               class="embla__ios-picker__slide text-lg"
             >
-              {{ index }}
+              {{ _ }}
             </div>
           </div>
         </div>

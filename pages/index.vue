@@ -1,8 +1,17 @@
 <script setup lang='ts'>
+import {
+  createYearRange
+} from 'reka-ui/date'
+import { CalendarDate, type DateValue } from '@internationalized/date'
 
 const hour_val = ref(1)
 watch(hour_val, () => {
   console.log(hour_val.value);
+})
+
+const startEndYear = computed(() => {
+  const cur_year = new Date().getFullYear()
+  return [cur_year, cur_year - 60]
 })
 </script>
 
@@ -11,13 +20,14 @@ watch(hour_val, () => {
     <BaseDarkMode />
     <div class="flex items-center">
       <IosPicker
-        label="Hours"
-        :slide-count="24"
+        label="Years"
+        :start="startEndYear[1]"
+        :end="startEndYear[0]"
         :loop="true"
       />
       <IosPicker
         label="Mins"
-        :slide-count="60"
+        :end="60"
         perspective="right"
         :loop="true"
       />
