@@ -12,10 +12,13 @@ watch(date, () => {
 </script>
 
 <template>
-  <div class="w-screen h-screen">
+  <div class="">
     <BaseDarkMode />
-    jk
-    <UButton label="Submit" />
-    <!-- <RuleMeasure /> -->
+
+    <div>
+      <RuleMeasure />
+    </div>
+
+    <!-- <BaseDatePicker /> -->
   </div>
 </template>
