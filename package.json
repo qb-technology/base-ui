@@ -16,6 +16,7 @@
     "@iconify-json/fluent": "^1.2.13",
     "@iconify-json/heroicons": "^1.2.2",
     "@nuxt/eslint": "1.0.1",
+    "@nuxt/ui": "^3.0.0-alpha.12",
     "@vueuse/nuxt": "12.5.0",
     "embla-carousel-vue": "^8.5.2",
     "eslint": "^9.0.0",
@@ -25,12 +26,17 @@
   },
   "dependencies": {
     "@internationalized/date": "^3.7.0",
-    "@nuxt/ui": "^3.0.0-alpha.12",
     "es-toolkit": "^1.32.0",
     "reka-ui": "^1.0.0-alpha.9",
     "zod": "^3.24.1"
   },
   "trustedDependencies": [
     "@parcel/watcher"
-  ]
+  ],
+  "overrides": {
+    "tailwindcss": "4.0.4",
+    "@tailwindcss/node": "4.0.4",
+    "@tailwindcss/postcss": "4.0.4",
+    "@tailwindcss/vite": "4.0.4"
+  }
 }

@@ -15,6 +15,7 @@ watch(date, () => {
   <div class="w-screen h-screen">
     <BaseDarkMode />
     jk
+    <UButton label="Submit" />
     <!-- <RuleMeasure /> -->
   </div>
 </template>
