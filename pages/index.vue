@@ -12,9 +12,9 @@ watch(date, () => {
 </script>
 
 <template>
-  <div>
+  <div class="w-screen h-screen">
     <BaseDarkMode />
-
-    <BaseDatePicker v-model="date" />
+    jk
+    <!-- <RuleMeasure /> -->
   </div>
 </template>

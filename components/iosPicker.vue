@@ -1,5 +1,4 @@
 <script setup lang='ts'>
-// import type { EmblaCarouselVueType as EmblaCarouselType } from 'embla-carousel-vue';
 import type { EmblaCarouselType, EmblaOptionsType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-vue'
 import { range } from 'es-toolkit';
