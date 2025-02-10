@@ -26,7 +26,9 @@ const maxAge = props.maxAge// max age is 60
 const maxDays = ref(31)
 
 const month_val_index = ref(0)
-const year_val_index = ref(maxAge) // initialized to the current year
+// initialized to the current year
+// plus one because the index does not start 0
+const year_val_index = ref(maxAge + 1)
 
 // get the range to show eg. 1965 to 2025
 const yearRange = computed(() => {

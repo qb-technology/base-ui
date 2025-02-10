@@ -1,18 +1,71 @@
 <script setup lang='ts'>
 import type { EmblaCarouselType, EmblaOptionsType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-vue'
-import { range } from 'es-toolkit';
+import { random, range } from 'es-toolkit';
 import type { PropType } from 'vue';
 
+type VariantStyleType = {
+  indicator_color?: string
+  label_class?: string
+  item_class?: string
+}
+
+const props = defineProps({
+  loop: Boolean,
+  label: {
+    type: String,
+    default: 'hours'
+  },
+  start: {
+    type: Number,
+    default: 0
+  },
+  end: {
+    type: Number,
+    default: 24
+  },
+  step: {
+    type: Number,
+    default: 1
+  },
+  startIndex: {
+    type: Number,
+    default: 0
+  },
+  perspective: {
+    type: String as PropType<'left' | 'right' | 'center'>,
+    default: 'center',
+    validator: (val: string) => ['left', 'right', 'center'].includes(val)
+  },
+  modelValue: Number,
+  itemSize: {
+    type: Number,
+    default: 32,
+    validator: (val: number) => val >= 32
+  },
+  variantStyle: {
+    type: Object as PropType<VariantStyleType>
+  }
+})
+
+const emits = defineEmits(['update:modelValue'])
+
+const _modelValue = computed({
+  set: val => emits('update:modelValue', val),
+  get: () => props.modelValue
+})
+
+const WHEEL_ITEM_SIZE = computed(() => props.itemSize)
+
 const CIRCLE_DEGREES = 360
-const WHEEL_ITEM_SIZE = 32
+// const WHEEL_ITEM_SIZE = 32
 const WHEEL_ITEM_COUNT = 18
 const WHEEL_ITEMS_IN_VIEW = 4
 
 const WHEEL_ITEM_RADIUS = CIRCLE_DEGREES / WHEEL_ITEM_COUNT
 const IN_VIEW_DEGREES = WHEEL_ITEM_RADIUS * WHEEL_ITEMS_IN_VIEW
 const WHEEL_RADIUS = Math.round(
-  WHEEL_ITEM_SIZE / 2 / Math.tan(Math.PI / WHEEL_ITEM_COUNT)
+  WHEEL_ITEM_SIZE.value / 2 / Math.tan(Math.PI / WHEEL_ITEM_COUNT)
 )
 
 const isInView = (wheelLocation: number, slidePosition: number): boolean =>
@@ -71,49 +124,13 @@ const setContainerStyles = (
   emblaApi.containerNode().style.transform = `translateZ(${WHEEL_RADIUS}px) rotateX(${wheelRotation}deg)`
 }
 
-const props = defineProps({
-  loop: Boolean,
-  label: {
-    type: String,
-    default: 'hours'
-  },
-  start: {
-    type: Number,
-    default: 0
-  },
-  end: {
-    type: Number,
-    default: 24
-  },
-  step: {
-    type: Number,
-    default: 1
-  },
-  startIndex: {
-    type: Number,
-    default: 0
-  },
-  perspective: {
-    type: String as PropType<'left' | 'right' | 'center'>,
-    default: 'center',
-    validator: (val: string) => ['left', 'right', 'center'].includes(val)
-  },
-  modelValue: Number
-})
-const emits = defineEmits(['update:modelValue'])
-
-const _modelValue = computed({
-  set: val => emits('update:modelValue', val),
-  get: () => props.modelValue
-})
-
 const options = {
   loop: props.loop,
   axis: 'y',
   dragFree: true,
   containScroll: false,
   watchSlides: false,
-  startIndex: props.startIndex
+  startIndex: props.modelValue ? props.modelValue - 1 : props.startIndex
 } as EmblaOptionsType
 
 const [emblaRef, emblaApi] = useEmblaCarousel({ ...options })
@@ -160,7 +177,7 @@ function onPointerUp(api: EmblaCarouselType) {
   if (!api) return
   const { scrollTo, target, location } = api.internalEngine()
   const diffToTarget = target.get() - location.get()
-  const factor = Math.abs(diffToTarget) < WHEEL_ITEM_SIZE / 2.5 ? 10 : 0.1
+  const factor = Math.abs(diffToTarget) < WHEEL_ITEM_SIZE.value / 2.5 ? 10 : 0.1
   const distance = diffToTarget * factor
   scrollTo.distance(distance, true)
 }
@@ -179,7 +196,6 @@ function initFunc() {
     rotateWheel(api)
   })
   emblaApi.value.on('select', updateCurrentValue)
-  // updateCurrentValue(emblaApi.value)
 }
 
 onMounted(() => {
@@ -191,31 +207,63 @@ watchArray([emblaApi, emblaRef, slides], () => {
   initFunc()
 }, { deep: true })
 
-// watch(emblaRef, () => {
-//   // updateCurrentValue()
-// })
-
 defineExpose({
   emblaRef, emblaApi
 })
+
+/**
+ * styling
+ */
+const containerRef = useTemplateRef('el')
+const wheel_key = ref('--wheel-item-size')
+const item_size_cssVar = useCssVar(wheel_key, containerRef, { initialValue: `${WHEEL_ITEM_SIZE.value}px` })
+
+onMounted(() => {
+  item_size_cssVar.value = `${WHEEL_ITEM_SIZE.value}px`
+})
+
+const defaultStyle = computed(() => ({
+  indicator_color: props.variantStyle?.indicator_color ? props.variantStyle.indicator_color : 'border-neutral-200 dark:border-neutral-700',
+  label_class: props.variantStyle?.indicator_color ? props.variantStyle.label_class : '',
+  item_class: props.variantStyle?.indicator_color ? props.variantStyle.item_class : 'text-lg',
+} as VariantStyleType))
 </script>
 
 <template>
-  <div class="embla before:bg-linear-to-t before:from-[var(--ui-bg)]/65 before:to-[var(--ui-bg)] before:border-b-[0.5px] before:border-[var(--ui-border-muted)] after:border-t-[0.5px] after:border-[var(--ui-border-muted)] after:bg-linear-to-b after:from-[var(--ui-bg)]/65 after:to-[var(--ui-bg)]">
+  <div
+    ref="el"
+    class="embla"
+  >
+    <!-- overlays -->
+    <div
+      class="absolute z-[1] pointer-events-none w-full left-0 right-0 top-0 bg-linear-to-t from-[var(--ui-bg)]/65 to-[var(--ui-bg)] border-b-[0.5px]"
+      :class="[...Object.values(defaultStyle)]"
+      :style="`height: calc(50% - ${item_size_cssVar} / 2)`"
+    />
+    <div
+      class="absolute z-[1] pointer-events-none w-full left-0 right-0 bottom-0 bg-linear-to-b from-[var(--ui-bg)]/65 to-[var(--ui-bg)] border-t-[0.5px]"
+      :class="[defaultStyle.indicator_color]"
+      :style="`height: calc(50% - ${item_size_cssVar} / 2)`"
+    />
+    <!-- ending -->
     <div class="embla__ios-picker h-full min-w-[50%] flex items-center justify-center gap-3 relative">
       <div
         ref="rootNodeRef"
         class="embla__ios-picker__scene w-full h-full overflow-hidden flex items-center touch-pan-x"
+        :class="[defaultStyle.indicator_color]"
       >
         <div
           ref="emblaRef"
           :class="[`embla__ios-picker__viewport embla__ios-picker__viewport--perspective-${perspective}`]"
+          class="w-full perspective-[1000px] select-none"
+          :style="`height: ${WHEEL_ITEM_SIZE}px`"
         >
           <div class="embla__ios-picker__container h-full w-full transform-3d will-change-transform">
             <div
               v-for="(_, index) of slides"
               :key="index"
-              class="embla__ios-picker__slide text-lg w-fit"
+              class="embla__ios-picker__slide w-fit"
+              :class="[defaultStyle.item_class]"
             >
               <slot
                 name="content"
@@ -228,7 +276,10 @@ defineExpose({
           </div>
         </div>
       </div>
-      <div class="embla__ios-picker__label font-bold">
+      <div
+        class="embla__ios-picker__label font-bold"
+        :class="defaultStyle.label_class"
+      >
         {{ label }}
       </div>
     </div>
@@ -245,57 +296,13 @@ defineExpose({
   margin-left: auto;
   margin-right: auto;
 }
-.embla:before,
-.embla:after {
-  position: absolute;
-  left: 0;
-  right: 0;
-  content: '';
-  display: block;
-  height: calc(50% - 32px / 2);
-  z-index: 1;
-  pointer-events: none;
-}
 .embla:before {
   top: -0.5px;
-  /* border-bottom: 0.5px solid rgba(var(--text-high-contrast-rgb-value), 0.3);
-  background: linear-gradient(
-    to top,
-    rgba(var(--background-site-rgb-value), 0.65) 0%,
-    rgba(var(--background-site-rgb-value), 1) 100%
-  ); */
 }
 .embla:after {
   bottom: -0.5px;
-  /* border-top: 0.5px solid rgba(var(--text-high-contrast-rgb-value), 0.3);
-  background: linear-gradient(
-    to bottom,
-    rgba(var(--background-site-rgb-value), 0.65) 0%,
-    rgba(var(--background-site-rgb-value), 1) 100%
-  ); */
 }
-/*
-.embla__ios-picker {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  min-width: 50%;
-  justify-content: center;
-  line-height: 1;
-  font-size: 1.8rem;
-}
-
-.embla__ios-picker__scene {
-  height: 100%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  touch-action: pan-x;
-}*/
 .embla__ios-picker__viewport {
-  height: 32px;
-  width: 100%;
-  perspective: 1000px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -316,18 +323,9 @@ defineExpose({
   perspective-origin: calc(50% - 0px) 50%;
   transform: translateX(0px);
 }
-/*
-.embla__ios-picker__container {
-  height: 100%;
-  width: 100%;
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-*/
 .embla__ios-picker__slide {
   width: 100%;
   height: 100%;
-  /* font-size: 19px; */
   text-align: center;
   display: flex;
   align-items: center;
