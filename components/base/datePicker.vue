@@ -104,6 +104,7 @@ onMounted(() => {
         perspective="left"
         loop
         :start-index="maxAge"
+        type="first"
       />
     </div>
 
@@ -119,6 +120,7 @@ onMounted(() => {
         perspective="center"
         loop
         :start-index="month_index"
+        type="first"
       />
     </div>
 
@@ -135,6 +137,7 @@ onMounted(() => {
         perspective="right"
         loop
         :start-index="day_index"
+        type="first"
       />
     </div>
   </div>

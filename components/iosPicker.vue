@@ -2,13 +2,15 @@
 import type { EmblaCarouselType, EmblaOptionsType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-vue'
 import { random, range } from 'es-toolkit';
-import type { PropType } from 'vue';
+import type { Prop, PropType } from 'vue';
 
 type VariantStyleType = {
   indicator_color?: string
   label_class?: string
   item_class?: string
 }
+
+type typeSelector = 'first' | 'second' | 'third'
 
 const props = defineProps({
   loop: Boolean,
@@ -45,6 +47,11 @@ const props = defineProps({
   },
   variantStyle: {
     type: Object as PropType<VariantStyleType>
+  },
+  type: {
+    type: String as PropType<typeSelector>,
+    default: 'first',
+    validator: (val: string) => ['first', 'second', 'third'].includes(val)
   }
 })
 
@@ -227,17 +234,29 @@ const defaultStyle = computed(() => ({
   label_class: props.variantStyle?.indicator_color ? props.variantStyle.label_class : '',
   item_class: props.variantStyle?.indicator_color ? props.variantStyle.item_class : 'text-lg',
 } as VariantStyleType))
+
+const _varType = (_tt: typeSelector) => {
+  if (_tt === 'first') return 'w-full'
+  else if (_tt === 'second') return 'w-fit'
+
+  return ''
+}
+const varType = computed(() => {
+  if (props.type !== 'third') return _varType(props.type)
+  return _varType('first')
+})
 </script>
 
 <template>
   <div
     ref="el"
-    class="embla"
+    class="embla relative px-5 mx-auto"
+    :class="[varType]"
   >
     <!-- overlays -->
     <div
       class="absolute z-[1] pointer-events-none w-full left-0 right-0 top-0 bg-linear-to-t from-[var(--ui-bg)]/65 to-[var(--ui-bg)] border-b-[0.5px]"
-      :class="[...Object.values(defaultStyle)]"
+      :class="[defaultStyle.indicator_color]"
       :style="`height: calc(50% - ${item_size_cssVar} / 2)`"
     />
     <div
@@ -249,8 +268,8 @@ const defaultStyle = computed(() => ({
     <div class="embla__ios-picker h-full min-w-[50%] flex items-center justify-center gap-3 relative">
       <div
         ref="rootNodeRef"
-        class="embla__ios-picker__scene w-full h-full overflow-hidden flex items-center touch-pan-x"
-        :class="[defaultStyle.indicator_color]"
+        class="embla__ios-picker__scene h-full overflow-hidden flex items-center touch-pan-x"
+        :class="[defaultStyle.indicator_color, varType]"
       >
         <div
           ref="emblaRef"
@@ -270,7 +289,7 @@ const defaultStyle = computed(() => ({
                 :item="_"
                 :index="index"
               >
-                {{ _ }}
+                <span class="px-4">{{ _ }}</span>
               </slot>
             </div>
           </div>
@@ -288,13 +307,8 @@ const defaultStyle = computed(() => ({
 
 <style scoped>
 .embla {
-  position: relative;
-  display: block;
-  width: 100%;
   height: 22.2rem;
   max-width: 30rem;
-  margin-left: auto;
-  margin-right: auto;
 }
 .embla:before {
   top: -0.5px;
