@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import type { PropType } from 'vue'
-import type { DropdownMenuItem, ButtonProps, DropdownMenuProps } from '#ui/types'
+import type { DropdownMenuItem, ButtonProps, DropdownMenuProps, NavigationMenuProps, NavigationMenuItem } from '#ui/types'
+import type { MaybeArrayOfArray } from '#ui/types/utils';
 
 const menuEl = useTemplateRef('menuEl')
 const { width: menu_width, height: menu_height } = useElementSize(menuEl)
@@ -47,6 +48,9 @@ const props = defineProps({
   name: {
     type: String,
     default: 'QB Tech'
+  },
+  footerMenu: {
+    type: Object as PropType<NavigationMenuProps<MaybeArrayOfArray<NavigationMenuItem>>>,
   }
 })
 
@@ -93,7 +97,7 @@ const props = defineProps({
       class="w-full h-fit absolute right-0 left-0 bottom-0"
     >
       <slot name="footerMenu">
-        <BaseTemplateMenuMobileV1 />
+        <BaseTemplateMenuMobileV1 :menu="footerMenu" />
       </slot>
     </div>
   </UContainer>

@@ -73,8 +73,7 @@ watchArray([month, year], () => {
 
 function updateModelValue() {
   year.value = yearRange.value.from + year_val_index.value - 1
-  const cal_date = new CalendarDate(year.value, month.value, day.value)
-  _modelValue.value = toDate(cal_date).toDateString()
+  _modelValue.value = `${day.value}-${month.value}-${year.value}`
 }
 
 watchArray([year_val_index, day, month,], () => {
