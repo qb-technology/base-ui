@@ -1,57 +1,57 @@
-<script setup lang="ts">
-import { Icon } from '@iconify/vue'
-import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading, CalendarNext, CalendarPrev, CalendarRoot, type CalendarRootProps } from 'reka-ui'
-import { CalendarDate } from '@internationalized/date'
+<script setup lang='ts'>
+import {
+  CalendarCell,
+  CalendarCellTrigger,
+  CalendarGrid,
+  CalendarGridBody,
+  CalendarGridHead,
+  CalendarGridRow,
+  CalendarHeadCell,
+  CalendarHeader,
+  CalendarHeading,
+  CalendarNext,
+  CalendarPrev,
+  CalendarRoot
+} from 'reka-ui'
+import { CalendarDate } from '@internationalized/date';
+import { createMonth, toDate } from 'reka-ui/date';
 
-const date = new CalendarDate(2024, 10, 3)
+const _month = computed(() => createMonth({ dateObj: new CalendarDate(1995, 8, 18), weekStartsOn: 0, locale: 'en', fixedWeeks: true }))
 
-const isDateUnavailable: CalendarRootProps['isDateUnavailable'] = (date) => {
-  return date.day === 17 || date.day === 18
-}
+// console.log(toDate(month.value.value).toLocaleString('en-US', { month: 'long' }), month.value);
+
+// const days_week = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const date = _month.value.value
 </script>
 
 <template>
   <CalendarRoot
     v-slot="{ weekDays, grid }"
-    :is-date-unavailable="isDateUnavailable"
     :default-value="date"
-    class="mt-6 rounded-xl bg-white p-4 shadow-sm border"
-    fixed-weeks
   >
-    <CalendarHeader class="flex items-center justify-between">
+    <CalendarHeader class="flex items-center justify-center">
       <CalendarPrev
-        class="inline-flex items-center cursor-pointer text-black justify-center rounded-md bg-transparent w-7 h-7 hover:bg-stone-50 active:scale-98 active:transition-all focus:shadow-[0_0_0_2px] focus:shadow-black"
-      >
-        <Icon
-          icon="radix-icons:chevron-left"
-          class="w-4 h-4"
-        />
-      </CalendarPrev>
-      <CalendarHeading class="text-sm text-black font-medium" />
-
+        ref="prev"
+        class="hidden"
+      />
+      <CalendarHeading class="text-base font-medium" />
       <CalendarNext
-        class="inline-flex items-center cursor-pointer justify-center text-black rounded-md bg-transparent w-7 h-7 hover:bg-stone-50 active:scale-98 active:transition-all focus:shadow-[0_0_0_2px] focus:shadow-black"
-      >
-        <Icon
-          icon="radix-icons:chevron-right"
-          class="w-4 h-4"
-        />
-      </CalendarNext>
+        ref="next"
+        class="hidden"
+      />
     </CalendarHeader>
-    <div
-      class="flex flex-col space-y-4 pt-4 sm:flex-row sm:space-x-4 sm:space-y-0"
-    >
+    <div class="grid">
       <CalendarGrid
         v-for="month in grid"
         :key="month.value.toString()"
-        class="w-full border-collapse select-none space-y-1"
+        class="w-full border-collapse select-none"
       >
         <CalendarGridHead>
           <CalendarGridRow class="mb-1 grid w-full grid-cols-7">
             <CalendarHeadCell
               v-for="day in weekDays"
               :key="day"
-              class="rounded-md text-xs text-green8"
+              class="font-medium"
             >
               {{ day }}
             </CalendarHeadCell>
@@ -61,7 +61,7 @@ const isDateUnavailable: CalendarRootProps['isDateUnavailable'] = (date) => {
           <CalendarGridRow
             v-for="(weekDates, index) in month.rows"
             :key="`weekDate-${index}`"
-            class="grid grid-cols-7 border divide-x"
+            class="grid grid-cols-7"
           >
             <CalendarCell
               v-for="weekDate in weekDates"
@@ -72,7 +72,7 @@ const isDateUnavailable: CalendarRootProps['isDateUnavailable'] = (date) => {
               <CalendarCellTrigger
                 :day="weekDate"
                 :month="month.value"
-                class="relative flex items-center justify-center rounded-full whitespace-nowrap text-sm font-normal text-black w-8 h-8 outline-none focus:shadow-[0_0_0_2px] focus:shadow-black data-[outside-view]:text-black/30 data-[selected]:!bg-green10 data-[selected]:text-white hover:bg-green5 data-[highlighted]:bg-green5 data-[unavailable]:pointer-events-none data-[unavailable]:text-black/30 data-[unavailable]:line-through before:absolute before:top-[5px] before:hidden before:rounded-full before:w-1 before:h-1 before:bg-white data-[today]:before:block data-[today]:before:bg-green9 "
+                class="relative flex items-center justify-center"
               />
             </CalendarCell>
           </CalendarGridRow>
@@ -81,3 +81,38 @@ const isDateUnavailable: CalendarRootProps['isDateUnavailable'] = (date) => {
     </div>
   </CalendarRoot>
 </template>
+
+<!-- <template>
+  <div class="w-full h-full">
+    <div class="w-full grid grid-cols-7">
+      <div
+        v-for="i of 7"
+        :key="i"
+        class="text-center"
+      >
+        <span class="text-base font-medium">{{ days_week[i] }}</span>
+      </div>
+    </div>
+
+    <div class="border border-[var(--ui-border-muted)] divide-y divide-[var(--ui-border-muted)]">
+      <div
+        v-for="(row, ind) of month.rows"
+        :key="ind"
+      >
+        <div class="w-full grid grid-cols-7 divide-x divide-[var(--ui-border-muted)] h-[48px]">
+          <div
+            v-for="(day, d_ind) of row"
+            :key="d_ind"
+            class=" relative w-full grid place-content-center"
+          >
+            <span class="absolute top-0 left-0">{{ day.day }}</span>
+            <UIcon
+              name="i-qb-blood-drop"
+              class="w-4 h-4"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template> -->
