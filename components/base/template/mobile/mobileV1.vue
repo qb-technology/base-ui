@@ -129,7 +129,7 @@ const _nu_items = [{
           </UDropdownMenu>
         </slot>
       </div>
-      <div class="w-full flex-grow overflow-y-auto">
+      <div class="w-full flex-grow overflow-y-auto no-scrollbar">
         <slot />
       </div>
     </div>
