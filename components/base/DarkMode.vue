@@ -17,6 +17,7 @@ const isDark = computed({
       color="neutral"
       variant="solid"
       aria-label="Theme"
+      v-bind="$attrs"
       @click="isDark = !isDark"
     />
     <template #fallback>

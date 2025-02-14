@@ -54,6 +54,34 @@ const props = defineProps({
   }
 })
 
+// export type BaseTemplateMobileV1Prop = {
+//   menuButton: ButtonProps
+//   menu: DropdownMenuProps<DropdownMenuItem>
+//   name?: string
+//   footerMenu?: NavigationMenuProps<MaybeArrayOfArray<NavigationMenuItem>>
+// }
+
+// withDefaults(defineProps<BaseTemplateMobileV1Prop>(), {
+//   name: 'QB Tech',
+
+// })
+const colorMode = useColorMode()
+const isDark = computed({
+  get() {
+    return colorMode.value === 'dark'
+  },
+  set() {
+    colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+  }
+})
+
+const _nu_items = [{
+  label: 'Theme',
+  slot: 'theme',
+  onSelect: () => {
+    isDark.value = !isDark.value
+  }
+}] as DropdownMenuItem[]
 </script>
 
 <template>
@@ -77,7 +105,7 @@ const props = defineProps({
 
         <slot name="menu">
           <UDropdownMenu
-            v-bind="props.menu"
+            v-bind="{ ...props.menu }"
             :content="{
               align: 'end',
               side: 'bottom',
@@ -85,6 +113,19 @@ const props = defineProps({
             :ui="{ content: 'w-48' }"
           >
             <UButton v-bind="props.menuButton" />
+
+            <template #theme>
+              <ClientOnly>
+                <template #fallback>
+                  <UButton
+                    color="neutral"
+                    variant="link"
+                    label="Theme"
+                  />
+                </template>
+                <BaseDarkMode />
+              </ClientOnly>
+            </template>
           </UDropdownMenu>
         </slot>
       </div>
